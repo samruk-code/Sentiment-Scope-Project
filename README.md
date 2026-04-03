@@ -96,7 +96,6 @@ The model checkpoint achieving >75% test accuracy is saved and included in the r
 Sentiment-Scope-Project/
 │
 ├── SentimentScope_Project.ipynb   # Main notebook: EDA, model, training, evaluation
-├── model_checkpoint/              # Saved model weights (.pt file)
 ├── .gitignore
 └── README.md
 ```
