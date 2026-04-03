@@ -1,13 +1,6 @@
 # 🎬 SentimentScope — Transformer-Based Sentiment Analysis
 
-> **AWS AI Scientist Nanodegree | NLP Project**  
 > Sentiment classification on IMDB movie reviews using a custom BERT-based transformer model.
-
-[![Python](https://img.shields.io/badge/Python-3.8%2B-blue?logo=python&logoColor=white)](https://python.org)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org)
-[![HuggingFace](https://img.shields.io/badge/HuggingFace-Transformers-FFD21F?logo=huggingface&logoColor=black)](https://huggingface.co)
-[![Accuracy](https://img.shields.io/badge/Test%20Accuracy-%3E75%25-success)](https://github.com/samruk-code/Sentiment-Scope-Project)
-[![License](https://img.shields.io/badge/License-MIT-lightgrey)](LICENSE)
 
 ---
 
