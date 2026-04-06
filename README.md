@@ -1,80 +1,110 @@
-# 🎬 SentimentScope — Transformer-Based Sentiment Analysis
+# SentimentScope — Transformer-Based Sentiment Analysis
 
-> Sentiment classification on IMDB movie reviews using a custom BERT-based transformer model.
+> A custom transformer model built from scratch for binary sentiment classification on IMDB movie reviews.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Project Overview](#project-overview)
 - [Business Context](#business-context)
+- [How This Differs from a Generation Transformer](#how-this-differs-from-a-generation-transformer)
 - [Architecture](#architecture)
 - [Dataset](#dataset)
 - [Results](#results)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
-- [Key Concepts & Skills Demonstrated](#key-concepts--skills-demonstrated)
+- [Skills Demonstrated](#skills-demonstrated)
 - [Acknowledgements](#acknowledgements)
 
 ---
 
 ## Project Overview
 
-**SentimentScope** is an end-to-end NLP pipeline that fine-tunes a transformer model for binary sentiment classification. Given a movie review, the model predicts whether the sentiment is **positive** or **negative** with over 75% accuracy on held-out test data.
+**SentimentScope** is an end-to-end NLP pipeline that builds and trains a transformer model **from scratch** for binary sentiment classification. Given a movie review, the model predicts whether the sentiment is **positive** or **negative**, achieving over 75% accuracy on held-out test data.
 
-This project was completed as part of the **AWS AI Scientist Nanodegree** and demonstrates practical skills in deep learning, natural language processing, and transformer architecture design.
+This project was completed as part of the **Udacity AWS AI Scientist Nanodegree** and demonstrates practical skills in deep learning, natural language processing, and transformer architecture design.
 
 ---
 
 ## Business Context
 
-Imagine you're a Machine Learning Engineer at **CineScope**, an entertainment company building a next-generation recommendation engine. Understanding how users *feel* about content — not just what they watch — is the key to personalizing suggestions at scale.
+As a Machine Learning Engineer at **CineScope**, an entertainment company focused on helping audiences discover movies and shows they love, the task is to enhance the recommendation engine by understanding user sentiment about content they engage with.
 
-SentimentScope solves this by automatically classifying user reviews as positive or negative, feeding that signal directly into CineScope's recommendation algorithms to improve user satisfaction and engagement.
+SentimentScope solves this by automatically classifying user reviews as positive or negative. These sentiment signals feed directly into CineScope's personalization algorithms, enabling more accurate recommendations and improving user satisfaction at scale.
+
+---
+
+## How This Differs from a Generation Transformer
+
+This project adapts transformer knowledge from generation tasks to a classification task. The key differences:
+
+| Aspect | Generation Model | SentimentScope (Classification) |
+|---|---|---|
+| Data format | Continuous token stream with sliding window | Individual reviews paired with a label |
+| Tokenization | Character-level | Subword (BERT BPE via `bert-base-uncased`) |
+| Output | Next-token prediction (token-level) | Single pooled vector → 2 class logits |
+| Pooling | Last token hidden state | Mean of all token embeddings |
+| Training | Random shuffler over steps | Epoch-based (full passes over dataset) |
 
 ---
 
 ## Architecture
 
-The model adapts a `bert-base-uncased` transformer backbone for binary classification:
+The model is built entirely from scratch using PyTorch, with only the tokenizer borrowed from `bert-base-uncased`:
 
 ```
 Input Text
     │
     ▼
-[BERT Tokenizer]  ← subword tokenization, padding & truncation
+[BERT Tokenizer]               ← subword tokenization, padding & truncation (max_length=128)
     │
     ▼
-[Transformer Encoder]  ← multi-head self-attention + feed-forward layers
+[Token + Position Embeddings]  ← learned embeddings for tokens and positions
     │
     ▼
-[Mean Pooling]  ← condenses all token embeddings → single vector
+[Transformer Blocks] x8        ← decoder-style with causal (lower-triangular) masking
+    │   ├── Layer Normalization        (pre-norm)
+    │   ├── Multi-Head Self-Attention  (8 heads, head_size=32)
+    │   ├── Residual Connection
+    │   ├── Layer Normalization        (pre-norm)
+    │   ├── Feed-Forward Network       (d_embed=256, 4x expansion, GELU)
+    │   └── Residual Connection
     │
     ▼
-[Classification Head]  ← linear layer → 2 logits (positive / negative)
+[Mean Pooling]                 ← average all token embeddings → single vector
+    │
+    ▼
+[Classification Head]          ← Linear layer → 2 logits (positive / negative)
     │
     ▼
 Sentiment Label
 ```
 
-**Key design decisions vs. a generation model:**
+**Hyperparameters:**
 
-| Aspect | Generation Model | SentimentScope (Classification) |
-|---|---|---|
-| Data format | Continuous token stream | Review + label pairs |
-| Tokenization | Character-level | Subword (BERT BPE) |
-| Output | Next-token prediction | Binary class logits |
-| Pooling | Last token hidden state | Mean of all token embeddings |
-| Training | Sliding window | Epoch-based (full-pass) |
+| Parameter | Value |
+|---|---|
+| Embedding dimension (`d_embed`) | 256 |
+| Transformer blocks | 8 |
+| Attention heads | 8 |
+| Head size | 32 |
+| Max sequence length | 128 |
+| Batch size | 32 |
+| Optimizer | AdamW |
+| Learning rate | 3e-4 |
+| Loss function | CrossEntropyLoss |
+| Dropout rate | 0.2 |
+| Epochs | 10 |
 
 ---
 
 ## Dataset
 
-- **Source:** [IMDB Large Movie Review Dataset](https://huggingface.co/datasets/imdb) via HuggingFace `datasets`
-- **Size:** 50,000 reviews (25k train / 25k test)
-- **Labels:** Binary — `positive` / `negative`
-- **Split used:** Train → 80% training / 20% validation, with provided test set held out
+- **Source:** [IMDB Large Movie Review Dataset](https://ai.stanford.edu/~amaas/data/sentiment/)
+- **Size:** 50,000 reviews — 25,000 train / 25,000 test
+- **Labels:** Binary — `positive` (1) / `negative` (0), balanced classes
+- **Split:** Training set → 90% train (22,500) / 10% validation (2,500); test set held out for final evaluation
 
 ---
 
@@ -82,11 +112,10 @@ Sentiment Label
 
 | Split | Accuracy |
 |---|---|
-| Training | tracked per epoch |
-| Validation | tracked per epoch |
-| **Test** | **> 75%** ✅ |
+| Validation | Tracked per epoch |
+| **Test** | **> 75%** |
 
-The model checkpoint achieving >75% test accuracy is saved and included in the repository.
+Validation accuracy and loss are tracked across all epochs to monitor for overfitting. The model is evaluated on the held-out test set after training completes.
 
 ---
 
@@ -95,8 +124,7 @@ The model checkpoint achieving >75% test accuracy is saved and included in the r
 ```
 Sentiment-Scope-Project/
 │
-├── SentimentScope_Project.ipynb   # Main notebook: EDA, model, training, evaluation
-├── .gitignore
+├── SentimentScope_Project.ipynb   # Main notebook: EDA, architecture, training, evaluation
 └── README.md
 ```
 
@@ -107,10 +135,10 @@ Sentiment-Scope-Project/
 ### Prerequisites
 
 ```bash
-pip install torch transformers datasets scikit-learn matplotlib
+pip install torch transformers pandas matplotlib
 ```
 
-### Run the notebook
+### Run the Notebook
 
 1. Clone the repository:
    ```bash
@@ -118,36 +146,42 @@ pip install torch transformers datasets scikit-learn matplotlib
    cd Sentiment-Scope-Project
    ```
 
-2. Launch Jupyter:
+2. Download the IMDB dataset:
+   ```bash
+   # The dataset (aclImdb_v1.tar.gz) must be placed in the project root before running
+   ```
+
+3. Launch Jupyter:
    ```bash
    jupyter notebook SentimentScope_Project.ipynb
    ```
 
-3. Run all cells top-to-bottom. The notebook will:
-   - Download and explore the IMDB dataset
-   - Tokenize and build PyTorch `DataLoader` objects
-   - Initialize and customize the transformer model
-   - Train with validation tracking across epochs
-   - Evaluate on the held-out test set
+4. Run all cells top-to-bottom. The notebook will:
+   - Load and explore the IMDB dataset with visualizations
+   - Tokenize reviews and build PyTorch `DataLoader` objects
+   - Define and initialize the custom transformer architecture
+   - Train with loss and accuracy tracked per epoch
+   - Evaluate final performance on the held-out test set
+   - Run sample predictions on new reviews
 
 > **Note:** A GPU is strongly recommended for training. The notebook is compatible with AWS SageMaker, Google Colab, and local environments.
 
 ---
 
-## Key Concepts & Skills Demonstrated
+## Skills Demonstrated
 
-- **Transformer architecture** — understanding attention mechanisms and adapting them for classification
-- **HuggingFace ecosystem** — using `bert-base-uncased` tokenizer and pre-trained weights
-- **Custom PyTorch Dataset & DataLoader** — batching, shuffling, and padding sequences
-- **Training loop design** — loss calculation, optimizer steps, gradient clipping
-- **Validation & overfitting detection** — tracking loss and accuracy across epochs
-- **Model checkpointing** — saving the best-performing model weights
-- **NLP data preprocessing** — tokenization, truncation, attention masks
+- **Transformer architecture from scratch** — implementing attention heads, multi-head attention, feed-forward blocks, and learned positional embeddings in PyTorch
+- **Adapting transformers for classification** — mean pooling over token embeddings and a classification head instead of next-token prediction
+- **HuggingFace tokenizer** — subword tokenization with `bert-base-uncased`, including padding, truncation, and attention masks
+- **Custom PyTorch Dataset & DataLoader** — batching, shuffling, and preprocessing sequences for training
+- **Training loop design** — loss calculation, AdamW optimization, epoch-based training with validation
+- **Model evaluation** — accuracy calculation on validation and test sets, overfitting detection across epochs
+- **NLP data preprocessing** — exploratory analysis, label distribution, review length analysis
 
 ---
 
 ## Acknowledgements
 
 - Project brief provided by **Udacity / AWS AI Scientist Nanodegree**
-- Dataset: [IMDB Dataset](https://huggingface.co/datasets/imdb) via HuggingFace
-- Model backbone: [bert-base-uncased](https://huggingface.co/bert-base-uncased) by Google
+- Dataset: [IMDB Large Movie Review Dataset](https://ai.stanford.edu/~amaas/data/sentiment/) — Maas et al., 2011
+- Tokenizer: [bert-base-uncased](https://huggingface.co/bert-base-uncased) by Google via HuggingFace
