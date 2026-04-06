@@ -21,7 +21,7 @@
 
 ## Project Overview
 
-**SentimentScope** is an end-to-end NLP pipeline that builds and trains a transformer model **from scratch** for binary sentiment classification. Given a movie review, the model predicts whether the sentiment is **positive** or **negative**, achieving over 75% accuracy on held-out test data.
+**SentimentScope** is an end-to-end NLP pipeline that trains a transformer model **from scratch** for binary sentiment classification. Given a movie review, the model predicts whether the sentiment is **positive** or **negative**, achieving over 75% accuracy on held-out test data.
 
 This project was completed as part of the **Udacity AWS AI Scientist Nanodegree** and demonstrates practical skills in deep learning, natural language processing, and transformer architecture design.
 
@@ -29,7 +29,7 @@ This project was completed as part of the **Udacity AWS AI Scientist Nanodegree*
 
 ## Business Context
 
-As a Machine Learning Engineer at **CineScope**, an entertainment company focused on helping audiences discover movies and shows they love, the task is to enhance the recommendation engine by understanding user sentiment about content they engage with.
+As a Machine Learning Engineer at **CineScope** — an entertainment company that helps audiences discover movies and shows they love — the goal was to enhance the recommendation engine by understanding user sentiment about content they engage with.
 
 SentimentScope solves this by automatically classifying user reviews as positive or negative. These sentiment signals feed directly into CineScope's personalization algorithms, enabling more accurate recommendations and improving user satisfaction at scale.
 
@@ -37,7 +37,7 @@ SentimentScope solves this by automatically classifying user reviews as positive
 
 ## How This Differs from a Generation Transformer
 
-This project adapts transformer knowledge from generation tasks to a classification task. The key differences:
+This project adapts a transformer from a generation task to a classification task. The key differences:
 
 | Aspect | Generation Model | SentimentScope (Classification) |
 |---|---|---|
@@ -51,7 +51,7 @@ This project adapts transformer knowledge from generation tasks to a classificat
 
 ## Architecture
 
-The model is built entirely from scratch using PyTorch, with only the tokenizer borrowed from `bert-base-uncased`:
+The model is built entirely in PyTorch from scratch, with only the tokenizer borrowed from `bert-base-uncased`:
 
 ```
 Input Text
@@ -115,7 +115,7 @@ Sentiment Label
 | Validation | Tracked per epoch |
 | **Test** | **> 75%** |
 
-Validation accuracy and loss are tracked across all epochs to monitor for overfitting. The model is evaluated on the held-out test set after training completes.
+Validation accuracy and loss are tracked across all epochs to monitor for overfitting. The model is evaluated once on the held-out test set after training completes.
 
 ---
 
@@ -146,10 +146,7 @@ pip install torch transformers pandas matplotlib
    cd Sentiment-Scope-Project
    ```
 
-2. Download the IMDB dataset:
-   ```bash
-   # The dataset (aclImdb_v1.tar.gz) must be placed in the project root before running
-   ```
+2. Download the IMDB dataset and place `aclImdb_v1.tar.gz` in the project root before running.
 
 3. Launch Jupyter:
    ```bash
@@ -170,13 +167,13 @@ pip install torch transformers pandas matplotlib
 
 ## Skills Demonstrated
 
-- **Transformer architecture from scratch** — implementing attention heads, multi-head attention, feed-forward blocks, and learned positional embeddings in PyTorch
-- **Adapting transformers for classification** — mean pooling over token embeddings and a classification head instead of next-token prediction
+- **Transformer architecture from scratch** — attention heads, multi-head attention, feed-forward blocks, and learned positional embeddings in PyTorch
+- **Adapting transformers for classification** — mean pooling over token embeddings with a linear classification head instead of next-token prediction
 - **HuggingFace tokenizer** — subword tokenization with `bert-base-uncased`, including padding, truncation, and attention masks
 - **Custom PyTorch Dataset & DataLoader** — batching, shuffling, and preprocessing sequences for training
-- **Training loop design** — loss calculation, AdamW optimization, epoch-based training with validation
-- **Model evaluation** — accuracy calculation on validation and test sets, overfitting detection across epochs
-- **NLP data preprocessing** — exploratory analysis, label distribution, review length analysis
+- **Training loop design** — loss calculation, AdamW optimization, and epoch-based training with per-epoch validation
+- **Model evaluation** — accuracy on validation and test sets, overfitting detection across epochs
+- **NLP data preprocessing** — exploratory analysis, label distribution, and review length analysis
 
 ---
 
@@ -184,4 +181,4 @@ pip install torch transformers pandas matplotlib
 
 - Project brief provided by **Udacity / AWS AI Scientist Nanodegree**
 - Dataset: [IMDB Large Movie Review Dataset](https://ai.stanford.edu/~amaas/data/sentiment/) — Maas et al., 2011
-- Tokenizer: [bert-base-uncased](https://huggingface.co/bert-base-uncased) by Google via HuggingFace
+- Tokenizer: [bert-base-uncased](https://huggingface.co/bert-base-uncased) by Google via Hugging Face
