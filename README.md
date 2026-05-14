@@ -21,7 +21,7 @@
 
 ## Project Overview
 
-**SentimentScope** is an end-to-end NLP pipeline that trains a transformer model **from scratch** for binary sentiment classification. Given a movie review, the model predicts whether the sentiment is **positive** or **negative**, achieving over 75% accuracy on held-out test data.
+This project is an end-to-end NLP pipeline that trains a transformer model **from scratch** for binary sentiment classification. Given a movie review, the model predicts whether the sentiment is **positive** or **negative**, achieving over 75% accuracy on held-out test data.
 
 This project was completed as part of the **Udacity AWS AI Scientist Nanodegree** and demonstrates practical skills in deep learning, natural language processing, and transformer architecture design.
 
@@ -32,20 +32,6 @@ This project was completed as part of the **Udacity AWS AI Scientist Nanodegree*
 As a Machine Learning Engineer at **CineScope** — an entertainment company that helps audiences discover movies and shows they love — the goal was to enhance the recommendation engine by understanding user sentiment about content they engage with.
 
 SentimentScope solves this by automatically classifying user reviews as positive or negative. These sentiment signals feed directly into CineScope's personalization algorithms, enabling more accurate recommendations and improving user satisfaction at scale.
-
----
-
-## How This Differs from a Generation Transformer
-
-This project adapts a transformer from a generation task to a classification task. The key differences:
-
-| Aspect | Generation Model | SentimentScope (Classification) |
-|---|---|---|
-| Data format | Continuous token stream with sliding window | Individual reviews paired with a label |
-| Tokenization | Character-level | Subword (BERT BPE via `bert-base-uncased`) |
-| Output | Next-token prediction (token-level) | Single pooled vector → 2 class logits |
-| Pooling | Last token hidden state | Mean of all token embeddings |
-| Training | Random shuffler over steps | Epoch-based (full passes over dataset) |
 
 ---
 
